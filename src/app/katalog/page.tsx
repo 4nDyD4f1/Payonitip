@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo, useEffect } from 'react';
 import { FilterSidebar } from '@/components/catalog/filter-sidebar';
@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { SlidersHorizontal } from 'lucide-react';
 import { Product } from '@/components/catalog/product-card';
 import { getProducts, getCategories } from '@/lib/supabase/api';
+import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '@/lib/mock-data';
+
+
 
 
 export default function CatalogPage() {
@@ -33,15 +36,18 @@ export default function CatalogPage() {
         if (productsData && productsData.length > 0) {
           setProducts(productsData as any);
         } else {
-          setProducts([]);
+          setProducts(MOCK_PRODUCTS as any);
         }
 
         if (categoriesData && categoriesData.length > 0) {
           setCategories(categoriesData as any);
+        } else {
+          setCategories(MOCK_CATEGORIES as any);
         }
       } catch (error) {
         console.error("Failed to fetch catalog data:", error);
-        setProducts([]);
+        setProducts(MOCK_PRODUCTS as any);
+        setCategories(MOCK_CATEGORIES as any);
       } finally {
         setLoading(false);
       }

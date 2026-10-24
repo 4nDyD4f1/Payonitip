@@ -9,17 +9,9 @@ import { cn, formatRupiah } from '@/lib/utils';
 import { useCartStore } from '@/hooks/use-cart';
 import { ProductCard, Product } from '@/components/catalog/product-card';
 import { getProductBySlug, getProducts, getProductReviews } from '@/lib/supabase/api';
+import { MOCK_PRODUCTS } from '@/lib/mock-data';
 
-const SAMPLE_PRODUCTS: Product[] = [
-  { id: '1', slug: 'pempek-kapal-selam', name: 'Pempek Kapal Selam', price: 25000, category: 'Individual', categories: { name: 'Individual', slug: 'individual' }, weight: '150g', rating: 4.8, total_orders: 450, description: 'Pempek kapal selam ukuran besar dengan isi telur bebek utuh. Disajikan dengan cuko kental khas Palembang.' },
-  { id: '2', slug: 'pempek-lenjer-besar', name: 'Pempek Lenjer Besar', price: 30000, category: 'Individual', categories: { name: 'Individual', slug: 'individual' }, weight: '200g', rating: 4.7, total_orders: 380, description: 'Pempek lenjer ukuran besar, kenyal dan gurih. Dibuat dari ikan tenggiri segar pilihan.' },
-  { id: '3', slug: 'pempek-kulit', name: 'Pempek Kulit', price: 8000, category: 'Individual', categories: { name: 'Individual', slug: 'individual' }, weight: '50g', rating: 4.5, total_orders: 620, description: 'Pempek kulit crispy yang gurih dan renyah. Sangat cocok dinikmati selagi hangat.' },
-  { id: '4', slug: 'pempek-adaan', name: 'Pempek Adaan', price: 9000, category: 'Individual', categories: { name: 'Individual', slug: 'individual' }, weight: '60g', rating: 4.6, total_orders: 540, description: 'Pempek adaan bulat dengan aroma daun bawang yang harum. Teksturnya kenyal dan rasanya gurih.' },
-  { id: '5', slug: 'paket-campur-a', name: 'Paket Campur A', price: 65000, category: 'Paket', categories: { name: 'Paket', slug: 'paket' }, weight: '10 Pcs', rating: 4.9, total_orders: 890, description: 'Paket hemat isi 10 pcs pempek campur (telur kecil, lenjer kecil, adaan, kulit). Cocok untuk disantap berdua atau bertiga.' },
-  { id: '6', slug: 'kerupuk-kemplang-super', name: 'Kerupuk Kemplang Super', price: 45000, category: 'Cemilan', categories: { name: 'Cemilan', slug: 'cemilan' }, weight: '500g', rating: 4.6, total_orders: 210, description: 'Kerupuk kemplang panggang asli Palembang. Renyah dan gurih, cocok sebagai pelengkap makan pempek.' },
-  { id: '7', slug: 'tekwan-kuah-udang', name: 'Tekwan Kuah Udang', price: 35000, category: 'Individual', categories: { name: 'Individual', slug: 'individual' }, weight: '300g', rating: 4.7, total_orders: 310, description: 'Tekwan dengan kuah kaldu udang yang segar, disajikan dengan jamur kuping, bengkoang, dan bihun.' },
-  { id: '8', slug: 'paket-hemat-keluarga', name: 'Paket Hemat Keluarga', price: 120000, category: 'Hemat', categories: { name: 'Hemat', slug: 'hemat' }, weight: '20 Pcs', rating: 4.9, total_orders: 1200, description: 'Paket besar isi 20 pcs pempek campur. Cocok untuk hidangan keluarga.' },
-];
+const SAMPLE_PRODUCTS: Product[] = MOCK_PRODUCTS as any;
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -119,8 +111,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-16">
         {/* Image Section */}
         <div className="aspect-square w-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#e8f1ff] to-red-100 dark:from-orange-900/40 dark:to-red-900/40 relative flex items-center justify-center">
-          {product.image ? (
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+          {(product.image || product.image_url) ? (
+            <img src={product.image || product.image_url} alt={product.name} className="w-full h-full object-cover" />
           ) : (
             <div className="text-center p-6">
               <span className="text-2xl font-bold text-orange-800/20 dark:text-orange-200/20 uppercase tracking-wider block mb-2">{product.name}</span>

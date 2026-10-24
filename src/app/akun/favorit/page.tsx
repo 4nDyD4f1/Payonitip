@@ -15,23 +15,23 @@ const SAMPLE_FAVORITES = [
   {
     id: 'prod-1',
     name: 'Pempek Kapal Selam',
-    price: 35000,
+    price: 25000,
     rating: 4.8,
-    imageColor: 'from-blue-400 to-blue-600',
+    image: '/images/pempek_kapal_selam.jpg',
   },
   {
-    id: 'prod-2',
+    id: 'prod-5',
     name: 'Paket Campur A',
-    price: 150000,
+    price: 65000,
     rating: 4.9,
-    imageColor: 'from-purple-400 to-purple-600',
+    image: '/images/paket_campur.jpg',
   },
   {
-    id: 'prod-3',
+    id: 'prod-7',
     name: 'Tekwan Kuah Udang',
-    price: 45000,
+    price: 35000,
     rating: 4.7,
-    imageColor: 'from-emerald-400 to-emerald-600',
+    image: '/images/tekwan_kuah_udang.jpg',
   }
 ];
 
@@ -101,9 +101,15 @@ export default function FavoritPage() {
           {favorites.map((product) => (
             <Card key={product.id} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-slate-900 overflow-hidden group">
               <div className="relative">
-                <div className={cn("w-full h-40 bg-gradient-to-br flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity", product.imageColor || 'from-slate-400 to-slate-600')}>
-                  <div className="w-20 h-20 bg-white/20 rounded-full backdrop-blur-sm" />
-                </div>
+                {product.image ? (
+                  <div className="w-full h-40 overflow-hidden">
+                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  </div>
+                ) : (
+                  <div className={cn("w-full h-40 bg-gradient-to-br flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity", product.imageColor || 'from-slate-400 to-slate-600')}>
+                    <div className="w-20 h-20 bg-white/20 rounded-full backdrop-blur-sm" />
+                  </div>
+                )}
                 <button 
                   onClick={() => handleRemoveFavorite(product.id)}
                   className="absolute top-3 right-3 p-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full shadow-sm hover:scale-110 transition-transform"

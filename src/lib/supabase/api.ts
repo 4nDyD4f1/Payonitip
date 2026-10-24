@@ -1,8 +1,21 @@
 import { createClient } from '@/lib/supabase/client'
 import type { Product, Category, Order, OrderTracking, Voucher, CustomOrder, Review } from '@/types'
+import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '@/lib/mock-data'
 
 function getSupabase() {
   return createClient()
+}
+
+function enrichProduct(product: any) {
+  if (!product) return product
+  if (!product.image && !product.image_url) {
+    const matched = MOCK_PRODUCTS.find(p => p.slug === product.slug || p.id === product.id)
+    if (matched) {
+      product.image = matched.image
+      product.image_url = matched.image_url
+    }
+  }
+  return product
 }
 
 // ============================================
@@ -10,77 +23,97 @@ function getSupabase() {
 // ============================================
 
 export async function getProducts() {
-  const { data, error } = await getSupabase()
-    .from('products')
-    .select('*, categories(name, slug)')
-    .eq('is_active', true)
-    .order('total_orders', { ascending: false })
+  try {
+    const { data, error } = await getSupabase()
+      .from('products')
+      .select('*, categories(name, slug)')
+      .eq('is_active', true)
+      .order('total_orders', { ascending: false })
 
-  if (error) {
-    console.error('Error fetching products:', error)
-    return []
+    if (error || !data || data.length === 0) {
+      return MOCK_PRODUCTS
+    }
+    return data.map(enrichProduct)
+  } catch (err) {
+    console.warn('Using fallback mock products:', err)
+    return MOCK_PRODUCTS
   }
-  return data || []
 }
 
 export async function getProductBySlug(slug: string) {
-  const { data, error } = await getSupabase()
-    .from('products')
-    .select('*, categories(name, slug)')
-    .eq('slug', slug)
-    .eq('is_active', true)
-    .single()
+  try {
+    const { data, error } = await getSupabase()
+      .from('products')
+      .select('*, categories(name, slug)')
+      .eq('slug', slug)
+      .eq('is_active', true)
+      .single()
 
-  if (error) {
-    console.error('Error fetching product:', error)
-    return null
+    if (error || !data) {
+      const fallback = MOCK_PRODUCTS.find(p => p.slug === slug)
+      return fallback || null
+    }
+    return enrichProduct(data)
+  } catch (err) {
+    const fallback = MOCK_PRODUCTS.find(p => p.slug === slug)
+    return fallback || null
   }
-  return data
 }
 
 export async function getProductsByCategory(categorySlug: string) {
-  const { data, error } = await getSupabase()
-    .from('products')
-    .select('*, categories!inner(name, slug)')
-    .eq('categories.slug', categorySlug)
-    .eq('is_active', true)
-    .order('total_orders', { ascending: false })
+  try {
+    const { data, error } = await getSupabase()
+      .from('products')
+      .select('*, categories!inner(name, slug)')
+      .eq('categories.slug', categorySlug)
+      .eq('is_active', true)
+      .order('total_orders', { ascending: false })
 
-  if (error) {
-    console.error('Error fetching products by category:', error)
-    return []
+    if (error || !data || data.length === 0) {
+      return MOCK_PRODUCTS.filter(p => p.categories?.slug === categorySlug)
+    }
+    return data.map(enrichProduct)
+  } catch (err) {
+    return MOCK_PRODUCTS.filter(p => p.categories?.slug === categorySlug)
   }
-  return data || []
 }
 
 export async function searchProducts(query: string) {
-  const { data, error } = await getSupabase()
-    .from('products')
-    .select('*, categories(name, slug)')
-    .eq('is_active', true)
-    .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
-    .order('total_orders', { ascending: false })
+  try {
+    const { data, error } = await getSupabase()
+      .from('products')
+      .select('*, categories(name, slug)')
+      .eq('is_active', true)
+      .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+      .order('total_orders', { ascending: false })
 
-  if (error) {
-    console.error('Error searching products:', error)
-    return []
+    if (error || !data || data.length === 0) {
+      const q = query.toLowerCase()
+      return MOCK_PRODUCTS.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
+    }
+    return data.map(enrichProduct)
+  } catch (err) {
+    const q = query.toLowerCase()
+    return MOCK_PRODUCTS.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
   }
-  return data || []
 }
 
 export async function getBestSellers(limit = 4) {
-  const { data, error } = await getSupabase()
-    .from('products')
-    .select('*, categories(name, slug)')
-    .eq('is_active', true)
-    .order('total_orders', { ascending: false })
-    .limit(limit)
+  try {
+    const { data, error } = await getSupabase()
+      .from('products')
+      .select('*, categories(name, slug)')
+      .eq('is_active', true)
+      .order('total_orders', { ascending: false })
+      .limit(limit)
 
-  if (error) {
-    console.error('Error fetching best sellers:', error.message || error)
-    return []
+    if (error || !data || data.length === 0) {
+      return MOCK_PRODUCTS.slice(0, limit)
+    }
+    return data.map(enrichProduct)
+  } catch (err) {
+    return MOCK_PRODUCTS.slice(0, limit)
   }
-  return data || []
 }
 
 // ============================================
@@ -88,16 +121,19 @@ export async function getBestSellers(limit = 4) {
 // ============================================
 
 export async function getCategories() {
-  const { data, error } = await getSupabase()
-    .from('categories')
-    .select('*')
-    .order('name')
+  try {
+    const { data, error } = await getSupabase()
+      .from('categories')
+      .select('*')
+      .order('name')
 
-  if (error) {
-    console.error('Error fetching categories:', error.message || error)
-    return []
+    if (error || !data || data.length === 0) {
+      return MOCK_CATEGORIES
+    }
+    return data
+  } catch (err) {
+    return MOCK_CATEGORIES
   }
-  return data || []
 }
 
 // ============================================
